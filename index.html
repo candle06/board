@@ -1,318 +1,273 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Eleview Board</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<title>Ele-Meter Chat</title>
+
 <style>
-body {
-  font-family: "Inter","Noto Sans KR",sans-serif;
-  margin: 0; padding: 0;
-  background: radial-gradient(circle at top, #1a002e, #000);
-  color: #fff; overflow-x: hidden;
+:root {
+  --bg:#050314;--card:#141226;--accent:#b184ff;
+  --accent-soft:rgba(177,132,255,0.3);
+  --text-main:#fff;--text-sub:#b8b8d9;
 }
-header {
-  text-align: center;
-  padding: 20px 0;
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(12px);
-  box-shadow: 0 4px 20px rgba(155,92,255,0.4);
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR",sans-serif;
+  background:radial-gradient(circle at top,#261654 0,#050314 55%,#02010a 100%);
+  color:var(--text-main);display:flex;justify-content:center;min-height:100vh;
 }
-h1 {
-  margin: 0;
-  font-weight: 700;
-  font-size: 24px;
-  color: #d8b4ff;
-  text-shadow: 0 0 12px #9b5cffaa;
+.app{width:100%;max-width:480px;padding:18px 16px 32px;}
+header{text-align:center;margin-bottom:18px;position:relative;}
+.logo{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:6px 12px;border-radius:999px;
+  background:rgba(9,9,40,0.6);
+  border:1px solid rgba(177,132,255,0.4);
+  font-size:13px;color:var(--accent);
 }
-.container {
-  max-width: 600px;
-  margin: 40px auto;
-  padding: 20px;
-  background: rgba(255,255,255,0.06);
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(155,92,255,0.2);
-  backdrop-filter: blur(10px);
+.title{margin-top:12px;font-size:22px;font-weight:700;}
+.subtitle{margin-top:4px;font-size:13px;color:var(--text-sub);}
+.status-chip{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:4px 10px;border-radius:999px;font-size:11px;margin-top:10px;
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);
 }
-input, textarea {
-  width: 95%;
-  margin-top: 6px;
-  padding: 10px;
-  border-radius: 10px;
-  border: none;
-  background: rgba(255,255,255,0.1);
-  color: #fff;
-  font-size: 14px;
-  outline: none;
+.dot{width:8px;height:8px;border-radius:50%;}
+.dot.idle{background:#777;}
+.dot.live{background:#3cffc2;box-shadow:0 0 6px #3cffc2;}
+
+.card{
+  background:radial-gradient(circle at top left,rgba(177,132,255,0.08),rgba(7,4,30,0.9));
+  border-radius:18px;padding:16px;border:1px solid rgba(177,132,255,0.35);
+  box-shadow:0 18px 40px rgba(0,0,0,0.6);
+  display:flex;flex-direction:column;height:60vh;
 }
-button {
-  background: linear-gradient(135deg,#9b5cff,#6e22ff);
-  color: #fff;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 10px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.2s;
+#chatBox{
+  flex:1;overflow-y:auto;padding-right:4px;
+  display:flex;flex-direction:column;gap:10px;
 }
-button:hover { transform: translateY(-2px); }
-.post {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(155,92,255,0.3);
-  border-radius: 14px;
-  padding: 15px;
-  margin-top: 16px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+.bubble{
+  max-width:80%;padding:10px 14px;border-radius:14px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.08);
+  font-size:14px;line-height:1.4;position:relative;word-break:break-word;
 }
-.post .author { color: #c6a0ff; font-weight: 600; }
-.comment-section {
-  margin-top: 12px;
-  padding: 10px;
-  background: rgba(255,255,255,0.03);
-  border-radius: 10px;
+.me{
+  align-self:flex-end;
+  background:linear-gradient(135deg,#d68bff,#8b5dff);
+  border:1px solid rgba(255,255,255,0.2);
+  color:#fff;
 }
-.comment {
-  margin-top: 8px;
-  padding: 8px;
-  border-radius: 8px;
-  background: rgba(255,255,255,0.08);
+.info{font-size:11px;color:var(--text-sub);margin-bottom:4px;}
+.admin-del{
+  position:absolute;top:-4px;right:-4px;font-size:10px;
+  padding:3px 6px;border-radius:6px;border:none;
+  background:#ff4b6a;color:#fff;cursor:pointer;
 }
-.comment strong { color: #d3a7ff; }
-.hidden { display: none; }
-.deleteBtn {
-  background: rgba(255,80,80,0.7);
-  padding: 5px 10px;
-  border-radius: 6px;
-  margin-top: 6px;
-  font-size: 12px;
+.input-wrap{display:flex;gap:10px;margin-top:12px;}
+#chatInput{
+  flex:1;padding:12px;border-radius:12px;
+  background:rgba(5,3,20,0.9);
+  border:1px solid rgba(255,255,255,0.08);
+  color:#fff;font-size:14px;outline:none;
+}
+#sendBtn{
+  flex-shrink:0;padding:12px 20px;border-radius:12px;border:none;
+  background:linear-gradient(135deg,#d68bff,#8b5dff);
+  color:#fff;font-weight:600;font-size:14px;cursor:pointer;
+  box-shadow:0 10px 22px rgba(140,86,255,0.5);
+}
+.menu-btn{
+  position:absolute;right:10px;top:14px;
+  padding:6px 10px;border-radius:999px;
+  background:rgba(9,9,40,0.7);
+  border:1px solid rgba(177,132,255,0.4);
+  cursor:pointer;color:#fff;font-size:18px;
+}
+.side-menu{
+  position:fixed;top:0;right:-270px;width:260px;height:100%;
+  background:radial-gradient(circle at top,#261654 0,#050314 60%);
+  border-left:1px solid rgba(177,132,255,0.35);
+  box-shadow:-18px 0 40px rgba(0,0,0,0.7);
+  padding:20px 16px;transition:0.28s ease-out;z-index:999;
+}
+.side-menu.open{right:0;}
+.side-menu h2{font-size:18px;color:var(--accent);margin:0 0 8px;}
+.side-menu h3{font-size:12px;color:var(--text-sub);margin:18px 0 6px;}
+.side-menu input{
+  width:100%;padding:9px 10px;border-radius:10px;border:none;
+  background:rgba(255,255,255,0.08);color:#fff;font-size:13px;margin-bottom:4px;
+}
+.side-menu button{
+  width:100%;padding:10px;border:none;border-radius:10px;font-size:13px;
+  background:linear-gradient(135deg,#d68bff,#8b5dff);color:#fff;font-weight:600;
+  cursor:pointer;margin-top:8px;
+}
+.side-menu .sub{
+  background:rgba(255,255,255,0.08);color:var(--text-sub);
+  border:1px solid rgba(255,255,255,0.15);
+}
+.menu-close{
+  position:absolute;right:14px;top:10px;background:rgba(255,255,255,0.12);
+  padding:4px 8px;border-radius:8px;font-size:16px;cursor:pointer;color:#fff;
 }
 </style>
 </head>
 <body>
+<div class="app">
 <header>
-  <h1>💬 Eleview Board</h1>
+  <div class="logo">💬 Ele-Meter Chat <span style="font-size:11px;color:var(--text-sub);">LIVE</span></div>
+  <div class="title">실시간 채팅방</div>
+  <div class="subtitle">닉네임 설정 후 자유롭게 대화해보세요!</div>
+  <div class="status-chip"><div class="dot idle" id="statusDot"></div><span id="statusText">대기</span></div>
+  <div class="menu-btn" onclick="toggleMenu()">☰</div>
 </header>
 
-<div class="container">
-
-  <!-- 로그인 -->
-  <div id="authSection">
-    <input id="email" type="email" placeholder="이메일 입력">
-    <input id="password" type="password" placeholder="비밀번호 입력">
-    <button onclick="login()">로그인</button>
-    <button onclick="signup()">회원가입</button>
+<section class="card">
+  <div id="chatBox"></div>
+  <div class="input-wrap">
+    <input id="chatInput" placeholder="메시지를 입력하세요">
+    <button id="sendBtn" onclick="sendMessage()">전송</button>
   </div>
-
-  <!-- 닉네임 -->
-  <div id="nicknameSection" class="hidden">
-    <input id="nickname" type="text" placeholder="닉네임을 설정하세요">
-    <button onclick="saveNickname()">닉네임 저장</button>
-  </div>
-
-  <!-- 글 입력 -->
-  <div id="postForm" class="hidden">
-    <textarea id="postContent" placeholder="게시글을 작성하세요..."></textarea>
-    <button onclick="savePost()">글 등록</button>
-  </div>
-
-  <!-- 글 목록 -->
-  <div id="postList"></div>
-
+</section>
 </div>
 
+<!-- 사이드 메뉴 -->
+<div class="side-menu" id="sideMenu">
+  <div class="menu-close" onclick="toggleMenu()">✕</div>
+  <h2>계정 설정</h2>
 
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <h3>로그인 / 회원가입</h3>
+  <input id="email" type="email" placeholder="이메일">
+  <input id="password" type="password" placeholder="비밀번호">
+  <button onclick="login()">로그인</button>
+  <button class="sub" onclick="signup()">회원가입</button>
+
+  <h3>닉네임</h3>
+  <input id="nickname" type="text" placeholder="닉네임">
+  <button onclick="saveNickname()">저장</button>
+
+  <h3>기타</h3>
+  <button class="sub" onclick="logout()">로그아웃</button>
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <script>
-// 🔧 Firebase 설정
-const firebaseConfig = {
-    apiKey: "AIzaSyApdyHj-1DiEsOG7XZ6zmDLIEwtLJZ70Js",
-    authDomain: "elev-5374e.firebaseapp.com",
-    databaseURL: "https://elev-5374e-default-rtdb.firebaseio.com",
-    projectId: "elev-5374e",
-    storageBucket: "elev-5374e.firebasestorage.app",
-    messagingSenderId: "265381396625",
-    appId: "1:265381396625:web:5a3db379ef4a038ee43f30"
+const firebaseConfig={
+  apiKey:"AIzaSyApdyHj-1DiEsOG7XZ6zmDLIEwtLJZ70Js",
+  authDomain:"elev-5374e.firebaseapp.com",
+  databaseURL:"https://elev-5374e-default-rtdb.firebaseio.com",
+  projectId:"elev-5374e",
+  storageBucket:"elev-5374e.appspot.com",
+  messagingSenderId:"265381396625",
+  appId:"1:265381396625:web:5a3db379ef4a038ee43f30"
 };
 firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth();
+const db=firebase.database();
 
-const auth = firebase.auth();
-const db = firebase.database();
+let currentUser=null;
+let nickname=localStorage.getItem("nickname")||"익명";
+const adminEmails=["candle0627@gmail.com","testadmin@sample.com"];
 
-// ✅ 관리자 이메일 목록
-const adminEmails = ["candle0627@gmail.com"];
+function toggleMenu(){
+  document.getElementById("sideMenu").classList.toggle("open");
+}
 
-let currentUser = null;
-let nickname = localStorage.getItem("nickname") || null;
-
-// 🔐 로그인 감지
-auth.onAuthStateChanged(user => {
-  if (user) {
-    currentUser = user;
-
-    document.getElementById('authSection').classList.add('hidden');
-    document.getElementById('nicknameSection').classList.remove('hidden');
-
-    if (nickname) {
-      document.getElementById('postForm').classList.remove('hidden');
-    }
-
-    loadPosts();
-  } else {
-    currentUser = null;
-    document.getElementById('authSection').classList.remove('hidden');
-    document.getElementById('nicknameSection').classList.add('hidden');
-    document.getElementById('postForm').classList.add('hidden');
-  }
+// 인증 상태
+auth.onAuthStateChanged(u=>{
+  currentUser=u;
+  const dot=document.getElementById("statusDot");
+  const txt=document.getElementById("statusText");
+  if(u){dot.classList.remove("idle");dot.classList.add("live");txt.textContent="온라인";loadMessages();}
+  else{dot.classList.remove("live");dot.classList.add("idle");txt.textContent="오프라인";}
 });
 
-// 🔑 로그인 / 회원가입
+// 로그인/회원가입
 function login(){
-  const email = email.value;
-  const pw = password.value;
-  auth.signInWithEmailAndPassword(email,pw).catch(e=>alert(e.message));
+  const email=document.getElementById("email").value.trim();
+  const pw=document.getElementById("password").value.trim();
+  auth.signInWithEmailAndPassword(email,pw)
+    .then(()=>alert("로그인 완료!")).catch(e=>alert(e.message));
 }
 function signup(){
-  const email = email.value;
-  const pw = password.value;
-  auth.createUserWithEmailAndPassword(email,pw).catch(e=>alert(e.message));
+  const email=document.getElementById("email").value.trim();
+  const pw=document.getElementById("password").value.trim();
+  auth.createUserWithEmailAndPassword(email,pw)
+    .then(()=>alert("회원가입 완료!")).catch(e=>alert(e.message));
 }
+function logout(){auth.signOut().then(()=>alert("로그아웃 완료"));}
 
-// 💬 닉네임 저장
+// 닉네임
 function saveNickname(){
-  nickname = document.getElementById('nickname').value.trim();
-  if(!nickname){ alert("닉네임을 입력해주세요."); return; }
-
-  localStorage.setItem('nickname', nickname);
-  document.getElementById('postForm').classList.remove('hidden');
-
-  alert(`닉네임이 "${nickname}"으로 설정되었습니다.`);
+  const n=document.getElementById("nickname").value.trim();
+  if(!n)return alert("닉네임 입력!");
+  nickname=n;localStorage.setItem("nickname",n);
+  if(currentUser) db.ref("lokchat/users/"+currentUser.uid).set({email:currentUser.email,nick:n});
+  alert("닉네임 저장 완료");
 }
 
-// 📝 게시글 저장
-function savePost(){
-  const text = postContent.value.trim();
-  if(!text) return alert("내용을 입력하세요.");
-  if(!nickname) return alert("닉네임을 먼저 설정하세요.");
-
-  db.ref("posts").push({
-    content: text,
-    author: nickname,
-    uid: currentUser.uid,
-    email: currentUser.email,
-    createdAt: Date.now()
+// 메시지 전송
+function sendMessage(){
+  if(!currentUser)return alert("로그인 필요!");
+  const input=document.getElementById("chatInput");
+  const text=input.value.trim();
+  if(!text)return;
+  db.ref("lokchat/messages").push({
+    text,author:nickname,uid:currentUser.uid,email:currentUser.email,
+    admin:adminEmails.includes(currentUser.email),
+    createdAt:Date.now()
   });
-
-  postContent.value = "";
+  input.value="";
 }
 
-// 📜 게시글 목록 불러오기
-function loadPosts(){
-  db.ref("posts").on("value", snap => {
-    const list = postList;
-    list.innerHTML = "";
+// 메시지 로드
+function loadMessages(){
+  const box=document.getElementById("chatBox");
+  const ref=db.ref("lokchat/messages");
+  ref.off();
 
-    if (!snap.exists()) {
-      list.innerHTML = "<p>게시글이 없습니다.</p>";
-      return;
+  ref.on("child_added",snap=>{
+    const m=snap.val();
+    const div=document.createElement("div");
+    const date=new Date(m.createdAt);
+    const time=date.toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit"});
+    const me=currentUser&&m.uid===currentUser.uid;
+    div.className="bubble"+(me?" me":"");
+    div.innerHTML=`<div class='info'>${m.author} · ${time}</div>${m.text}`;
+
+    // 관리자 삭제버튼
+    if(currentUser && adminEmails.includes(currentUser.email)){
+      const del=document.createElement("button");
+      del.className="admin-del";
+      del.textContent="삭제";
+      del.onclick=()=>db.ref("lokchat/messages/"+snap.key).remove();
+      div.appendChild(del);
     }
 
-    let arr = [];
-    snap.forEach(p => arr.push({...p.val(), key: p.key}));
-    arr.sort((a,b)=> b.createdAt - a.createdAt);
+    box.appendChild(div);
+    box.scrollTop=box.scrollHeight;
+  });
 
-    arr.forEach(p => {
-      const isOwner = currentUser && currentUser.uid === p.uid;
-      const isAdmin = currentUser && adminEmails.includes(currentUser.email);
-
-      const div = document.createElement("div");
-      div.className = "post";
-
-      div.innerHTML = `
-        <div class="author">👤 ${p.author}</div>
-        <div class="content">${p.content}</div>
-
-        ${(isOwner || isAdmin) ? 
-          `<button class="deleteBtn" onclick="deletePost('${p.key}')">삭제</button>` 
-          : ''}
-
-        <div class="comment-section" id="comment-${p.key}">
-          <div id="comments-${p.key}"></div>
-
-          ${currentUser ? `
-            <input id="commentInput-${p.key}" placeholder="댓글 입력...">
-            <button onclick="addComment('${p.key}')">등록</button>
-          ` : `<p style="font-size:13px;color:#aaa;">로그인 후 댓글 작성 가능</p>`}
-        </div>
-      `;
-
-      list.appendChild(div);
-
-      loadComments(p.key);
+  ref.on("child_removed",snap=>{
+    const nodes=box.querySelectorAll(".bubble");
+    nodes.forEach(n=>{
+      if(n.textContent.includes(snap.val()?.text)){
+        n.remove();
+      }
     });
   });
 }
 
-// 🔥 게시글 삭제 (본인 + 관리자만)
-function deletePost(postKey){
-  if (!confirm("정말 삭제할까요?")) return;
-  db.ref("posts/" + postKey).remove();
-  db.ref("comments/" + postKey).remove(); // 댓글도 같이 삭제
-}
-
-// 💬 댓글 저장
-function addComment(postKey){
-  const input = document.getElementById(`commentInput-${postKey}`);
-  const text = input.value.trim();
-  if (!text) return;
-
-  db.ref(`comments/${postKey}`).push({
-    text,
-    author: nickname || "익명",
-    uid: currentUser.uid,
-    email: currentUser.email,
-    createdAt: Date.now()
-  });
-
-  input.value = "";
-}
-
-// 💬 댓글 불러오기
-function loadComments(postKey){
-  db.ref(`comments/${postKey}`).on("value", snap => {
-    const box = document.getElementById(`comments-${postKey}`);
-    box.innerHTML = "";
-
-    if (!snap.exists()) return;
-
-    snap.forEach(c => {
-      const v = c.val();
-      const key = c.key;
-
-      const isOwner = currentUser && currentUser.uid === v.uid;
-      const isAdmin = currentUser && adminEmails.includes(currentUser.email);
-
-      box.innerHTML += `
-        <div class="comment">
-          <strong>${v.author}</strong>: ${v.text}
-          ${(isOwner || isAdmin) ? 
-            `<button class="deleteBtn" style="margin-left:10px" onclick="deleteComment('${postKey}','${key}')">삭제</button>`
-          : ''}
-        </div>
-      `;
-    });
-  });
-}
-
-// 🔥 댓글 삭제
-function deleteComment(postKey, commentKey){
-  if (!confirm("댓글을 삭제할까요?")) return;
-  db.ref(`comments/${postKey}/${commentKey}`).remove();
-}
+document.getElementById("chatInput").addEventListener("keyup",e=>{
+  if(e.key==="Enter")sendMessage();
+});
 </script>
 </body>
 </html>
