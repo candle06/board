@@ -551,7 +551,7 @@ newPostBtn.onclick = () => {
   }
 
   // 모든 모달 강제 닫기 (입력창 클릭 안되는 문제 해결)
-  document.querySelectorAll(".modal-backdrop").forEach(m => m.style.display = "none");
+  
 
   postTitle.value = "";
   postContent.value = "";
@@ -582,10 +582,12 @@ savePostBtn.onclick = async () => {
   // 이미지 업로드
   let imageUrl = "";
   const file = imageUpload.files[0];
+
   if (file) {
-    const ref = storage.ref("board_images/" + Date.now() + "_" + file.name);
-    await ref.put(file);
-    imageUrl = await ref.getDownloadURL();
+    const storageRef = storage.ref();
+    const imgRef = storageRef.child("board_images/" + Date.now() + "_" + file.name);
+    const snapshot = await imgRef.put(file);
+    imageUrl = await imgRef.getDownloadURL();
   }
 
   const now = new Date();
@@ -596,8 +598,8 @@ savePostBtn.onclick = async () => {
     String(now.getHours()).padStart(2, "0") + ":" +
     String(now.getMinutes()).padStart(2, "0");
 
-  // DB 저장
-  db.ref("board/posts").push({
+  // *** 핵심 수정: await 추가 ***
+  await db.ref("board/posts").push({
     title,
     content,
     imageUrl,
@@ -608,21 +610,16 @@ savePostBtn.onclick = async () => {
   });
 
   postModal.style.display = "none";
+  postTitle.value = "";
+  postContent.value = "";
+  imageUpload.value = "";
 };
-
 
 /* ======================================
             📄 게시글 리스트 로드
 ====================================== */
 function renderPosts(snap) {
-  if (!currentUser) {
-    postList.innerHTML = `
-      <div style="text-align:center;padding:20px;background:rgba(255,255,255,0.05);border-radius:12px;">
-        🔒 로그인 후 게시글을 볼 수 있습니다.
-      </div>`;
-    return;
-  }
-
+  // 👇 로그인 여부 상관없이 게시글은 항상 보여줌
   if (!snap.exists()) {
     postList.innerHTML = `<div style="text-align:center;color:#aaa;">게시글 없음</div>`;
     return;
